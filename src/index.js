@@ -1,9 +1,9 @@
 'use strict'
 
 const utils = require('./utils')
-const NatPmp = require('./mappers/nat-pmp')
+const NatPmp = require('./mappers/pmp')
 // const PCP = require('./pcp')
-// const UPnP = require('./upnp')
+const UPnP = require('./mappers/upnp')
 const EE = require('events')
 const tryEach = require('async/tryEach')
 
@@ -12,7 +12,8 @@ class NatManager extends EE {
     super()
 
     this.mappers = [
-      new NatPmp()
+      new NatPmp(),
+      new UPnP()
     ]
 
     this.activeMappings = {}
@@ -45,7 +46,7 @@ class NatManager extends EE {
   }
 
   getRouterIpCache () {
-    return this.routerIpCache
+    return [...this.routerIpCache]
   }
 
   getPrivateIps () {
