@@ -2,17 +2,26 @@
   "name": "js-libp2p-nat-mgr",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "aegir lint",
+    "docs": "aegir docs",
+    "build": "aegir build",
+    "test": "aegir test -t node",
+    "test:node": "aegir test -t node",
+    "release": "aegir release",
+    "release-minor": "aegir release --type minor",
+    "release-major": "aegir release --type major",
+    "coverage": "COVERAGE=true aegir coverage --timeout 50000",
+    "coverage-publish": "aegir coverage -u"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "": "^2.6.1",
     "dgram": "^1.0.1",
     "ipaddr.js": "^1.7.0",
-    "nat-pmp": "^1.0.0"
+    "nat-pmp": "^1.0.0",
+    "nat-upnp": "^1.1.1"
   },
   "devDependencies": {
     "aegir": "^13.1.0",
