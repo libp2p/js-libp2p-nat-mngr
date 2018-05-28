@@ -20,7 +20,7 @@ describe('NAT-PMP tests', () => {
 
   it('should add mapping', (done) => {
     let port = ~~(Math.random() * 65536)
-    natPMP.addMapping(port, port, 0, {}, [], (error, mapping) => {
+    natPMP.addMapping(port, port, 0, (error, mapping) => {
       expect(error).to.not.exist()
       expect(mapping.internalPort).to.be.eql(port)
       natmapping = mapping
@@ -29,8 +29,7 @@ describe('NAT-PMP tests', () => {
   }).timeout(5 * 10000)
 
   it('should delete a mapping', (done) => {
-    natPMP.mappings[natmapping.externalPort] = natmapping
-    natPMP.deleteMapping(natmapping.externalPort, {}, (error) => {
+    natPMP.deleteMapping(natmapping, (error) => {
       expect(error).to.not.exist()
       done()
     })

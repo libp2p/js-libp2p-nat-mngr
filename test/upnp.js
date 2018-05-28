@@ -20,7 +20,7 @@ describe('Nat UpNP tests', () => {
 
   it('should add mapping', (done) => {
     let port = ~~(Math.random() * 65536)
-    natUpnp.addMapping(port, port, 0, {}, [], (error, mapping) => {
+    natUpnp.addMapping(port, port, 0, (error, mapping) => {
       expect(error).to.not.exist()
       expect(mapping.internalPort).to.be.eql(port)
       natmapping = mapping
@@ -29,8 +29,7 @@ describe('Nat UpNP tests', () => {
   }).timeout(5 * 10000)
 
   it('should delete a mapping', (done) => {
-    natUpnp.mappings[natmapping.externalPort] = natmapping
-    natUpnp.deleteMapping(natmapping.externalPort, {}, (error) => {
+    natUpnp.deleteMapping(natmapping, (error) => {
       expect(error).to.not.exist()
       done()
     })

@@ -21,7 +21,8 @@
     "dgram": "^1.0.1",
     "ipaddr.js": "^1.7.0",
     "nat-pmp": "^1.0.0",
-    "nat-upnp": "^1.1.1"
+    "nat-upnp": "^1.1.1",
+    "network": "^0.4.1"
   },
   "devDependencies": {
     "aegir": "^13.1.0",

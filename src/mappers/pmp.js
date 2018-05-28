@@ -2,79 +2,86 @@
 
 const natPmp = require('nat-pmp')
 const waterfall = require('async/waterfall')
+const network = require('network')
 
 const Mapper = require('./mapper')
-const utils = require('../utils')
-
-const NAT_PMP_PROBE_PORT = 55555
 
 class NatPMP extends Mapper {
   constructor () {
-    super('natPmp', NAT_PMP_PROBE_PORT)
+    super('nat-pmp')
   }
 
   /**
-   * Create a port mapping
+   * Create port mapping
    *
-   * @param {String} routerIp
-   * @param {Number} intPort
-   * @param {Number} extPort
-   * @param {Number} ttl
+   * @param {number} intPort
+   * @param {number} extPort
+   * @param {number} ttl
    * @param {Function} callback
+   * @returns {undefined}
    */
-  createMapping (routerIp, intPort, extPort, ttl, callback) {
-    const client = natPmp.connect(routerIp)
-    const mapping = this.newMapping(intPort)
-    mapping.routerIp = routerIp
-    waterfall([
-      (cb) => client.externalIp((err, info) => {
+  createMapping (intPort, extPort, ttl, callback) {
+    network.get_active_interface((err, activeIf) => {
+      if (err) {
+        return callback(err)
+      }
+
+      const client = natPmp.connect(activeIf.gateway_ip)
+      const mapping = this.newMapping(intPort)
+      mapping.routerIp = activeIf.gateway_ip
+      waterfall([
+        (cb) => client.externalIp((err, info) => {
+          if (err) {
+            return callback(err)
+          }
+          mapping.externalIp = info.ip.join('.')
+          cb(null, mapping)
+        }),
+        (mapping, cb) => {
+          client.portMapping({
+            private: intPort,
+            public: extPort,
+            ttl
+          }, (err, info) => {
+            if (err) {
+              this.log.err(err)
+              return cb(err)
+            }
+
+            mapping.externalPort = info.public
+            mapping.internalPort = info.private
+            mapping.internalIp = activeIf.ip_address
+            mapping.ttl = info.ttl
+            cb(null, mapping)
+          })
+        }
+      ], (err, mapping) => {
+        client.close() // should be closed immediately
         if (err) {
           return callback(err)
         }
-        mapping.externalIp = info.ip.join('.')
-        cb(null, mapping)
-      }),
-      (mapping, cb) => {
-        client.portMapping({
-          private: intPort,
-          public: extPort,
-          ttl
-        }, (err, info) => {
-          if (err) {
-            this.log.err(err)
-            return cb(err)
-          }
-
-          mapping.externalPort = info.public
-          mapping.internalPort = info.private
-          mapping.ttl = info.ttl
-          // get the internal ip of the interface
-          // we're using to make the request
-          const internalIp = utils.longestPrefixMatch(utils.getPrivateIps(), routerIp)
-          mapping.internalIp = internalIp
-          cb(null, mapping)
-        })
-      }
-    ], (err, mapping) => {
-      client.close() // should be closed immediately
-      if (err) {
-        return callback(err)
-      }
-      callback(null, mapping)
+        callback(null, mapping)
+      })
     })
   }
 
-  _internalDeleteMapping (intPort, routerIp, extPort, callback) {
-    const client = natPmp.connect(routerIp)
-    client.portUnmapping({
-      private: intPort,
-      public: extPort
-    }, (err, info) => {
-      client.close() // should be closed immediately
+  _internalDeleteMapping (intPort, extPort, callback) {
+    network.get_gateway_ip((err, routerIp) => {
       if (err) {
         return callback(err)
       }
-      return callback(null, err)
+
+      const client = natPmp.connect(routerIp)
+      client.portUnmapping({
+        private: intPort,
+        public: extPort
+      }, (err, info) => {
+        client.close() // should be closed immediately
+        if (err) {
+          return callback(err)
+        }
+        return callback(null, err)
+      })
     })
   }
 }
