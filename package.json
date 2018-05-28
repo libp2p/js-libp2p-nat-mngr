@@ -1,5 +1,5 @@
 {
-  "name": "js-libp2p-nat-mgr",
+  "name": "js-libp2p-nat-mngr",
   "version": "1.0.0",
   "description": "",
   "main": "src/index.js",
