@@ -20,12 +20,12 @@ class NatManager extends EE {
     this.activeMappings = {}
   }
 
-  addMapping (intPort, extPort, lifetime, callback) {
+  addMapping (intPort, extPort, ttl, callback) {
     tryEach(this.mappers.map((mapper) => {
       return (cb) => {
         return mapper.addMapping(intPort,
           extPort,
-          lifetime,
+          ttl,
           (err, mapping) => {
             if (err) {
               return callback(err)
@@ -56,6 +56,10 @@ class NatManager extends EE {
         }
       }
     ], callback)
+  }
+
+  getPublicIp (callback) {
+    network.get_public_ip(callback)
   }
 
   close (callback) {

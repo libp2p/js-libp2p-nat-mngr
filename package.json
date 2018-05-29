@@ -1,7 +1,7 @@
 {
-  "name": "js-libp2p-nat-mngr",
+  "name": "libp2p-nat-mngr",
   "version": "1.0.0",
-  "description": "",
+  "description": "Create and remove NAT port mappings.",
   "main": "src/index.js",
   "scripts": {
     "lint": "aegir lint",
