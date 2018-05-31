@@ -4,7 +4,7 @@ const natPmp = require('nat-pmp')
 const waterfall = require('async/waterfall')
 const network = require('network')
 
-const Mapper = require('./mapper')
+const Mapper = require('./')
 
 class NatPMP extends Mapper {
   constructor () {
@@ -20,7 +20,7 @@ class NatPMP extends Mapper {
    * @param {Function} callback
    * @returns {undefined}
    */
-  createMapping (intPort, extPort, ttl, callback) {
+  _addPortMapping (intPort, extPort, ttl, callback) {
     network.get_active_interface((err, activeIf) => {
       if (err) {
         return callback(err)
@@ -65,7 +65,7 @@ class NatPMP extends Mapper {
     })
   }
 
-  _internalDeleteMapping (intPort, extPort, callback) {
+  _removePortMapping (intPort, extPort, callback) {
     network.get_gateway_ip((err, routerIp) => {
       if (err) {
         return callback(err)

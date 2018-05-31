@@ -18,11 +18,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "chai-checkmark": "^1.0.1",
     "dgram": "^1.0.1",
     "ipaddr.js": "^1.7.0",
     "nat-pmp": "^1.0.0",
     "nat-upnp": "^1.1.1",
-    "network": "^0.4.1"
+    "network": "^0.4.1",
+    "sinon": "^5.0.10"
   },
   "devDependencies": {
     "aegir": "^13.1.0",
