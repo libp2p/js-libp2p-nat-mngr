@@ -28,15 +28,15 @@ class NatManager extends EE {
           ttl,
           (err, mapping) => {
             if (err) {
-              return callback(err)
+              return cb(err)
             }
 
             const mapKey = `${mapping.externalIp}:${mapping.externalPort}`
             this.activeMappings[mapKey] = mapper
-            callback(null, mapping)
+            cb(null, mapping)
           })
       }
-    }))
+    }), callback)
   }
 
   deleteMapping (extPort, extIp, callback) {
@@ -52,7 +52,7 @@ class NatManager extends EE {
       (ip, cb) => {
         const mapper = this.activeMappings[`${ip}:${extPort}`]
         if (mapper) {
-          mapper.deleteMapping(extPort, callback)
+          mapper.deleteMapping(extPort, cb)
         }
       }
     ], callback)
@@ -60,6 +60,10 @@ class NatManager extends EE {
 
   getPublicIp (callback) {
     network.get_public_ip(callback)
+  }
+
+  getGwIp (callback) {
+    network.get_gateway_ip(callback)
   }
 
   close (callback) {
