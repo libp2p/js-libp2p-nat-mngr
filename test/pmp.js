@@ -26,12 +26,12 @@ describe('NAT-PMP tests', () => {
       natmapping = mapping
       done()
     })
-  }).timeout(5 * 10000)
+  })
 
   it('should delete a mapping', (done) => {
     natPMP.deleteMapping(natmapping, (error) => {
       expect(error).to.not.exist()
       done()
     })
-  }).timeout(5 * 10000)
+  })
 })

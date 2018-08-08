@@ -16,7 +16,7 @@
     "coverage-publish": "aegir coverage -u"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "chai-checkmark": "^1.0.1",
     "dgram": "^1.0.1",
