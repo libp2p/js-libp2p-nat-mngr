@@ -4,13 +4,21 @@ const NatPmp = require('./mappers/pmp')
 const UPnP = require('./mappers/upnp')
 const EE = require('events')
 const tryEach = require('async/tryEach')
+const eachSeries = require('async/eachSeries')
 const parallel = require('async/parallel')
 const waterfall = require('async/waterfall')
 const network = require('network')
 
+const log = require('debug')('libp2p-nat-mngr')
+
 class NatManager extends EE {
-  constructor (mappers) {
+  constructor (mappers, options) {
     super()
+
+    options = options || {
+      autorenew: true,
+      every: 60 * 10 * 1000
+    }
 
     this.mappers = mappers || [
       new NatPmp(),
@@ -18,6 +26,37 @@ class NatManager extends EE {
     ]
 
     this.activeMappings = {}
+
+    if (options.autorenew) {
+      setInterval(() => {
+        this.renewMappings()
+      }, options.every)
+    }
+  }
+
+  renewMappings (callback) {
+    callback = callback || (() => {})
+    this.getPublicIp((err, ip) => {
+      if (err) {
+        return log(err)
+      }
+
+      eachSeries(Object.keys(this.activeMappings), (key, cb) => {
+        const mapping = this.activeMappings[key].mappings[key]
+        if (mapping.externalIp !== ip) {
+          delete this.activeMappings[key]
+          this.addMapping(mapping.internalPort,
+            mapping.externalPort,
+            mapping.ttl,
+            (err) => {
+              if (err) {
+                return log(err)
+              }
+              return cb()
+            })
+        }
+      }, callback)
+    })
   }
 
   addMapping (intPort, extPort, ttl, callback) {
@@ -33,6 +72,7 @@ class NatManager extends EE {
 
             const mapKey = `${mapping.externalIp}:${mapping.externalPort}`
             this.activeMappings[mapKey] = mapper
+            this.emit('mapping', mapping)
             cb(null, mapping)
           })
       }
