@@ -17,7 +17,7 @@ describe('NAT manager', () => {
         super('mapper1')
       }
 
-      _addPortMapping (intPort, extPort, lifetime, cb) {
+      _addPortMapping (intPort, extPort, ttl, cb) {
         cb(null, this.newMapping(intPort))
       }
     }
@@ -38,7 +38,7 @@ describe('NAT manager', () => {
     let fail = true
 
     class Mapper1 extends Mapper {
-      _addPortMapping (intPort, extPort, lifetime, cb) {
+      _addPortMapping (intPort, extPort, ttl, cb) {
         cb(fail ? new Error('fail') : null, this.newMapping(intPort))
         fail = false
       }
@@ -55,6 +55,31 @@ describe('NAT manager', () => {
       expect(mapping.protocol).to.eql('2')
       expect(mapping.internalPort).to.eql(55555)
       done()
+    })
+  })
+
+  it('should renew mapping', (done) => {
+    class Mapper1 extends Mapper {
+      _addPortMapping (intPort, extPort, ttl, cb) {
+        const mapping = this.newMapping(intPort)
+        mapping.externalIp = '127.0.0.1'
+        mapping.externalPort = intPort
+        cb(null, mapping)
+      }
+    }
+
+    const manager = new Manager([
+      new Mapper1('1')
+    ])
+
+    manager.addMapping(55555, 55555, 0, (err, mapping) => {
+      manager.renewMappings(() => {
+        expect(err).to.not.exist()
+        expect(mapping).to.exist()
+        expect(mapping.protocol).to.eql('1')
+        expect(mapping.internalPort).to.eql(55555)
+        done()
+      })
     })
   })
 })
