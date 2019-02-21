@@ -1,8 +1,12 @@
 {
   "name": "libp2p-nat-mngr",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Create and remove NAT port mappings.",
   "main": "src/index.js",
+  "files": [
+    "dist",
+    "src"
+  ],
   "scripts": {
     "lint": "aegir lint",
     "docs": "aegir docs",
@@ -11,23 +15,23 @@
     "test:node": "aegir test -t node",
     "release": "aegir release",
     "release-minor": "aegir release --type minor",
-    "release-major": "aegir release --type major",
-    "coverage": "COVERAGE=true aegir coverage --timeout 50000",
-    "coverage-publish": "aegir coverage -u"
+    "release-major": "aegir release --type major"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "async": "^2.6.2",
     "chai-checkmark": "^1.0.1",
+    "debug": "^4.1.1",
     "dgram": "^1.0.1",
-    "ipaddr.js": "^1.7.0",
+    "ipaddr.js": "^1.9.0",
     "nat-pmp": "^1.0.0",
     "nat-upnp": "^1.1.1",
-    "network": "^0.4.1",
-    "sinon": "^5.0.10"
+    "network": "~0.4.1",
+    "sinon": "^7.2.4"
   },
   "devDependencies": {
-    "aegir": "^13.1.0",
+    "aegir": "^18.1.0",
     "chai": "^4.1.2",
     "dirty-chai": "^2.0.1"
   }
